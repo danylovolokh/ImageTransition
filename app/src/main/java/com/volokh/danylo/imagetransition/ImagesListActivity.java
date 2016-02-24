@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Loader;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -78,8 +80,25 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                View decorView = getWindow().getDecorView();
+
+
+                ImageView imageView = new ImageView(ImagesListActivity.this);
+                imageView.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
+                FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
+
+                contentView.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(contentView.getDrawingCache());
+                contentView.setDrawingCacheEnabled(false); // clear drawing cache
+                Log.v(TAG, "onClick, bitmap " + bitmap);
+
+                Log.v(TAG, "onClick, contentView " + contentView);
+                imageView.setImageBitmap(bitmap);
+                contentView.addView(imageView);
+                Log.v(TAG, "onClick, imageView.getLayoutParams() " + imageView.getLayoutParams());
+
+
             }
         });
     }

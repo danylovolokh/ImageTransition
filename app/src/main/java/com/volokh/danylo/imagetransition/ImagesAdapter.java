@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.models.Image;
@@ -42,6 +43,12 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
         Image image = mImagesList.get(position);
         holder.image.setScaleType(image.scaleType);
         mImageDownloader.load(image.imageFile).into(holder.image);
+
+        if(image.scaleType == ImageView.ScaleType.CENTER_CROP){
+            Log.v(TAG, "onBindViewHolder setWillNotCacheDrawing " + position);
+
+
+        }
         Log.v(TAG, "onBindViewHolder position " + position);
     }
 

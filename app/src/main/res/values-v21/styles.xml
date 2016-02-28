@@ -6,10 +6,17 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
 
-        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="ImagesDetailsActivityStyle" parent="AppTheme.NoActionBar">
+
+        <item name="android:windowBackground">@android:color/holo_green_dark</item>
 
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
+
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
 
         <item name="android:windowExitTransition">@transition/enter_exit</item>
         <item name="android:windowEnterTransition">@transition/enter_exit</item>
@@ -21,10 +28,16 @@
 
     <style name="ImagesListActivityStyle" parent="AppTheme.NoActionBar">
 
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/holo_blue_bright</item>
 
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
+
+        <item name="android:windowExitTransition">@transition/enter_exit</item>
+        <item name="android:windowEnterTransition">@transition/enter_exit</item>
+
+        <!--<item name="android:windowSharedElementEnterTransition">@transition/change_image_transition</item>-->
+        <!--<item name="android:windowSharedElementExitTransition">@transition/change_image_transition</item>-->
 
     </style>
 </resources>

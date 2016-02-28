@@ -1,4 +1,4 @@
-package com.volokh.danylo.imagetransition;
+package com.volokh.danylo.imagetransition.activities;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -7,7 +7,6 @@ import android.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +16,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.imagetransition.ImagesAdapter;
+import com.volokh.danylo.imagetransition.R;
 import com.volokh.danylo.imagetransition.models.Image;
 
 import java.io.File;
@@ -58,6 +59,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
     private Picasso mImageDownloader;
     private RecyclerView mRecyclerView;
     private ImagesAdapter mAdapter;
+    private ImageView mBackground;
 
 
     @Override
@@ -75,6 +77,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, SPAN_COUNT));
         mRecyclerView.setAdapter(mAdapter);
+        mBackground = (ImageView) findViewById(R.id.background);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +161,9 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
     @Override
     public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
         Log.v(TAG, "onLoadFinished, data " + data);
+
+        mImageDownloader.load(data.get(5)).into(mBackground
+        );
 
         fillImageList(data);
     }

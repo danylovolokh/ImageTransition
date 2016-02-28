@@ -14,8 +14,13 @@
         android:id="@+id/image_description"
         android:gravity="top|left"
         android:padding="20dp"
+        android:text="lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum,
+         lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum,
+          lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum, lorem ipsum,
+           lorem ipsum, lorem ipsum, lorem ipsum,"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:background="@android:color/holo_orange_dark"/>
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.volokh.danylo.imagetransition;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,9 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.volokh.danylo.imagetransition.activities.ImageDetailsActivity;
+import com.volokh.danylo.imagetransition.activities_v21.ImageDetailsActivity_v21;
 import com.volokh.danylo.imagetransition.models.Image;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -23,14 +25,21 @@ import java.util.List;
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
 
     private static final String TAG = ImagesAdapter.class.getSimpleName();
+
+    private final ImagesAdapterCallback mImagesAdapterCallback;
     private final List<Image> mImagesList;
     private final Picasso mImageDownloader;
     private final int mSpanCount;
 
-    public ImagesAdapter(List<Image> imagesList, Picasso imageDownloader, int spanCount) {
+    public interface ImagesAdapterCallback{
+        void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image);
+    }
 
-        this.mImagesList = imagesList;
-        this.mImageDownloader = imageDownloader;
+    public ImagesAdapter(ImagesAdapterCallback imagesAdapterCallback, List<Image> imagesList, Picasso imageDownloader, int spanCount) {
+
+        mImagesAdapterCallback = imagesAdapterCallback;
+        mImagesList = imagesList;
+        mImageDownloader = imageDownloader;
         mSpanCount = spanCount;
     }
 
@@ -66,12 +75,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
             public void onClick(View v) {
                 Activity activity = (Activity) holder.image.getContext();
 
-
-                ActivityOptions activityOptions =
-                        ActivityOptions.makeSceneTransitionAnimation(activity, holder.image, sharedImageTransitionName);
-
-                Intent startIntent = ImageDetailsActivity.getStartIntent(activity, sharedImageTransitionName, image.imageFile);
-                activity.startActivity(startIntent, activityOptions.toBundle());
+                mImagesAdapterCallback.enterImageDetails(sharedImageTransitionName, image.imageFile, holder.image);
 
             }
         });

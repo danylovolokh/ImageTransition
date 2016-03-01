@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ImagesListActivity">
+    tools:context=".activities.ImagesListActivity"
+    android:id="@+id/root_layout">
 
     <ImageView
         android:id="@+id/background"

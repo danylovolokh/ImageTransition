@@ -1,6 +1,7 @@
-package com.volokh.danylo.imagetransition.activities;
+package com.volokh.danylo.imagetransition.activities_v21;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
@@ -13,15 +14,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.ImagesAdapter;
 import com.volokh.danylo.imagetransition.R;
-import com.volokh.danylo.imagetransition.activities_v21.ImageDetailsActivity_v21;
-import com.volokh.danylo.imagetransition.activities_v21.ImagesListActivity_v21;
+import com.volokh.danylo.imagetransition.activities.ImagesListActivity;
 import com.volokh.danylo.imagetransition.models.Image;
 
 import java.io.File;
@@ -32,9 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ImagesListActivity extends Activity implements LoaderManager.LoaderCallbacks<List<File>>,ImagesAdapter.ImagesAdapterCallback {
+public class ImagesListActivity_v21 extends Activity implements LoaderManager.LoaderCallbacks<List<File>>,ImagesAdapter.ImagesAdapterCallback {
 
-    private static final String TAG = ImagesListActivity.class.getSimpleName();
+    private static final String TAG = ImagesListActivity_v21.class.getSimpleName();
 
     private static final SparseArray<String> mImagesResourcesList = new SparseArray<>();
 
@@ -61,13 +60,10 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
     private static final int SPAN_COUNT = 4;
 
     private Picasso mImageDownloader;
-
-    private static View mRootLayout;
     private RecyclerView mRecyclerView;
-
     private ImagesAdapter mAdapter;
     private ImageView mBackground;
-    private static FrameLayout sContentView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +75,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
         mAdapter = new ImagesAdapter(this, mImagesList, mImageDownloader, SPAN_COUNT);
 
         getLoaderManager().initLoader(0, null, this).forceLoad();
-        View decorView = getWindow().getDecorView();
-        sContentView = (FrameLayout) decorView.findViewById(android.R.id.content);
 
-        mRootLayout = findViewById(R.id.root_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.accounts_recycler_view);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, SPAN_COUNT));
@@ -97,7 +90,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
                 View decorView = getWindow().getDecorView();
 
 
-//                ImageView imageView = new ImageView(ImagesListActivity.this);
+//                ImageView imageView = new ImageView(ImagesListActivity_v21.this);
 //                imageView.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
 //                FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
 //
@@ -111,11 +104,10 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 //                contentView.addView(imageView);
 //                Log.v(TAG, "onClick, imageView.getLayoutParams() " + imageView.getLayoutParams());
 
+                ImagesListActivity_v21.this.finish();
 
-                ImagesListActivity.this.finish();
-
-                Intent startActivity_v21_intent = new Intent(ImagesListActivity.this, ImagesListActivity_v21.class);
-                startActivity(startActivity_v21_intent);
+                Intent startActivityIntent = new Intent(ImagesListActivity_v21.this, ImagesListActivity.class);
+                startActivity(startActivityIntent);
 
             }
         });
@@ -128,6 +120,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
             public List<File> loadInBackground() {
                 Log.v(TAG, "loadInBackground");
                 List<File> resultList = new ArrayList<>();
+
 
                 for (int resourceIndex = 0; resourceIndex < mImagesResourcesList.size(); resourceIndex++) {
 
@@ -176,7 +169,8 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
     public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
         Log.v(TAG, "onLoadFinished, data " + data);
 
-        mImageDownloader.load(data.get(5)).into(mBackground);
+        mImageDownloader.load(data.get(5)).into(mBackground
+        );
 
         fillImageList(data);
     }
@@ -224,31 +218,13 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 
     }
 
+
     @Override
     public void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image) {
+        ActivityOptions activityOptions =
+                ActivityOptions.makeSceneTransitionAnimation(this, image, sharedImageTransitionName);
 
-        View decorView = getWindow().getDecorView();
+        Intent startIntent = ImageDetailsActivity_v21.getStartIntent(this, sharedImageTransitionName, imageFile);
 
-        ImageView imageView = new ImageView(ImagesListActivity.this);
-        FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
-
-        contentView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(contentView.getDrawingCache());
-        contentView.setDrawingCacheEnabled(false); // clear drawing cache
-        Log.v(TAG, "onClick, bitmap " + bitmap);
-
-        Log.v(TAG, "onClick, contentView " + contentView);
-        imageView.setImageBitmap(bitmap);
-        contentView.addView(imageView);
-        Log.v(TAG, "onClick, imageView.getLayoutParams() " + imageView.getLayoutParams());
-
-        Intent startIntent = ImageDetailsActivity.getStartIntent(this, sharedImageTransitionName, imageFile);
-        startActivity(startIntent);
-    }
-
-    public static View getRootView() {
-//        setDrawingCache(); here then copy the view.
-        sContentView.removeView(mRootLayout);
-        return mRootLayout;
     }
 }

@@ -5,7 +5,6 @@ import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,10 +18,12 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.ImagesAdapter;
+import com.volokh.danylo.imagetransition.library.OverlayViewGroup;
 import com.volokh.danylo.imagetransition.R;
-import com.volokh.danylo.imagetransition.activities_v21.ImageDetailsActivity_v21;
 import com.volokh.danylo.imagetransition.activities_v21.ImagesListActivity_v21;
 import com.volokh.danylo.imagetransition.models.Image;
+import com.volokh.danylo.imagetransition.library.handler.TransitionHandler;
+import com.volokh.danylo.imagetransition.library.animators.FadeOutAnimator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,10 +70,15 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
     private ImageView mBackground;
     private static FrameLayout sContentView;
 
+    public static OverlayViewGroup sOverlayViewGroup;
+    private static ImageView sImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_accounts_list);
+
 
         mImageDownloader = Picasso.with(this);
 
@@ -169,6 +175,7 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
             fileOutputStream.close();
             inputStream.close();
         } catch (IOException e1) {
+            e1.printStackTrace();
         }
     }
 
@@ -226,29 +233,17 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 
     @Override
     public void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image) {
+        Log.v(TAG, "enterImageDetails, imageFile " + imageFile);
 
-        View decorView = getWindow().getDecorView();
 
-        ImageView imageView = new ImageView(ImagesListActivity.this);
-        FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
-
-        contentView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(contentView.getDrawingCache());
-        contentView.setDrawingCacheEnabled(false); // clear drawing cache
-        Log.v(TAG, "onClick, bitmap " + bitmap);
-
-        Log.v(TAG, "onClick, contentView " + contentView);
-        imageView.setImageBitmap(bitmap);
-        contentView.addView(imageView);
-        Log.v(TAG, "onClick, imageView.getLayoutParams() " + imageView.getLayoutParams());
+        TransitionHandler.instance()
+                .exitTransition()
+                .fromActivity(this)
+                .toActivity(ImageDetailsActivity.class)
+                .withExitAnimator(new FadeOutAnimator(4000))
+                .addTransitionView("TransitionName", image);
 
         Intent startIntent = ImageDetailsActivity.getStartIntent(this, sharedImageTransitionName, imageFile);
         startActivity(startIntent);
-    }
-
-    public static View getRootView() {
-//        setDrawingCache(); here then copy the view.
-        sContentView.removeView(mRootLayout);
-        return mRootLayout;
     }
 }

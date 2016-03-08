@@ -4,6 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:text="Detail Activity"
+        android:background="@android:color/holo_purple"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+
     <ImageView
         android:id="@+id/enlarged_image"
         android:layout_width="match_parent"

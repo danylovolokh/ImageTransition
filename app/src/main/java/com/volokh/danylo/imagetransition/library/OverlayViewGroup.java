@@ -1,9 +1,11 @@
-package com.volokh.danylo.imagetransition;
+package com.volokh.danylo.imagetransition.library;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 public class OverlayViewGroup extends ViewGroup {
 
 
+    private static final String TAG = OverlayViewGroup.class.getSimpleName();
     private final int mRight;
     private final int mBottom;
     /**
@@ -26,7 +29,7 @@ public class OverlayViewGroup extends ViewGroup {
      */
     ArrayList<Drawable> mDrawables = null;
 
-    OverlayViewGroup(Context context, View hostView) {
+    public OverlayViewGroup(Context context, View hostView) {
         super(context);
         mHostView = hostView;
 
@@ -37,7 +40,7 @@ public class OverlayViewGroup extends ViewGroup {
     public void add(Drawable drawable) {
         if (mDrawables == null) {
 
-            mDrawables = new ArrayList<Drawable>();
+            mDrawables = new ArrayList<>();
         }
         if (!mDrawables.contains(drawable)) {
             // Make each drawable unique in the overlay; can't add it more than once
@@ -61,8 +64,13 @@ public class OverlayViewGroup extends ViewGroup {
     }
 
     public void add(View child) {
+        Log.v(TAG, "add, child " + child);
+
         if (child.getParent() instanceof ViewGroup) {
+
             ViewGroup parent = (ViewGroup) child.getParent();
+            Log.v(TAG, "add, parent " + parent);
+
             if (parent != mHostView && parent.getParent() != null) {
                 // Moving to different container; figure out how to position child such that
                 // it is in the same location on the screen
@@ -72,16 +80,10 @@ public class OverlayViewGroup extends ViewGroup {
                 mHostView.getLocationOnScreen(hostViewLocation);
                 child.offsetLeftAndRight(parentLocation[0] - hostViewLocation[0]);
                 child.offsetTopAndBottom(parentLocation[1] - hostViewLocation[1]);
+            } else {
+                Log.v(TAG, "add, not added");
             }
             parent.removeView(child);
-            if (parent.getLayoutTransition() != null) {
-                // LayoutTransition will cause the child to delay removal - cancel it
-//                parent.getLayoutTransition().cancel(LayoutTransition.DISAPPEARING);
-            }
-            // fail-safe if view is still attached for any reason
-            if (child.getParent() != null) {
-//                child.mParent = null;
-            }
         }
         super.addView(child);
     }
@@ -98,15 +100,12 @@ public class OverlayViewGroup extends ViewGroup {
     }
 
     boolean isEmpty() {
-        if (getChildCount() == 0 &&
-                (mDrawables == null || mDrawables.size() == 0)) {
-            return true;
-        }
-        return false;
+        return getChildCount() == 0 &&
+                (mDrawables == null || mDrawables.size() == 0);
     }
 
     @Override
-    public void invalidateDrawable(Drawable drawable) {
+    public void invalidateDrawable(@NonNull Drawable drawable) {
         invalidate(drawable.getBounds());
     }
 

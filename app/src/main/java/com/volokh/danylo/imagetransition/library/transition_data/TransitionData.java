@@ -20,7 +20,7 @@ public abstract class TransitionData {
     private Class mEnterActivityClass;
 
     public void addTransitionView(String transitionName, ImageView view) {
-        Log.v(TAG, "addTransitionView, transitionName[" + transitionName + "], view " + view);
+        Log.v(TAG, "addSharedElement, transitionName[" + transitionName + "], view " + view);
         mExitTransitionViews.put(transitionName, view);
     }
 

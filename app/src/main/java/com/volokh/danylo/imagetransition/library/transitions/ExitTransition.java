@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.volokh.danylo.imagetransition.library.OverlayViewGroup;
 import com.volokh.danylo.imagetransition.library.Config;
+import com.volokh.danylo.imagetransition.library.animators.SharedElementTransitionAnimator;
+import com.volokh.danylo.imagetransition.library.animators.ViewTransitionAnimator;
 import com.volokh.danylo.imagetransition.library.handler.BaseTransition;
 import com.volokh.danylo.imagetransition.library.animators.TransitionAnimator;
 
@@ -27,9 +30,13 @@ public final class ExitTransition extends BaseTransition {
     private Activity mFromActivity;
     private Class mToActivity;
 
-    private TransitionAnimator mExitAnimator;
+    private ViewTransitionAnimator mExitAnimator;
 
     private View mExitContentView;
+
+    private OverlayViewGroup mOverlayViewGroup;
+
+    private SharedElementTransitionAnimator mSharedElementsTransitionAnimator;
 
     @Override
     protected void handleActivityCreated(final Activity activity, Bundle savedInstanceState) {
@@ -58,14 +65,14 @@ public final class ExitTransition extends BaseTransition {
 
                             // add shared elements to overlay view group
                             // set background without shared elements
-                            OverlayViewGroup overlayViewGroup = new OverlayViewGroup(activity, contentRoot);
+                            mOverlayViewGroup = new OverlayViewGroup(activity, contentRoot);
 //                                        overlayViewGroup.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));
 
-                            for (View view : getExitTransitionViews().values()) {
-                                overlayViewGroup.add(view);
+                            for (View view : getSharedElementsTransitionViews().values()) {
+                                mOverlayViewGroup.add(view);
                             }
 
-                            contentRoot.addView(overlayViewGroup);
+                            contentRoot.addView(mOverlayViewGroup);
 
                         } else {
 
@@ -88,13 +95,32 @@ public final class ExitTransition extends BaseTransition {
 
     }
 
+    @Override
+    public ExitTransition addSharedElement(String transitionName, View view) {
+        super.addSharedElement(transitionName, view);
+        return this;
+    }
 
     void animateExiting(View view) {
         if (SHOW_LOGS) Log.v(TAG, "animateExiting, view " + view);
         if (SHOW_LOGS) Log.v(TAG, "animateExiting, exitAnimator " + mExitAnimator);
 
         if (mExitAnimator != null) {
-            mExitAnimator.animate(view);
+            mExitAnimator.animate(view, new TransitionAnimator.TransitionAnimatorListener() {
+                @Override
+                public void onAnimationEnd() {
+                    if (SHOW_LOGS) Log.v(TAG, "onAnimationEnd, animateExiting");
+                    for (int index = 0; index < mOverlayViewGroup.getChildCount(); index++) {
+                        View child = mOverlayViewGroup.getChildAt(index);
+                        if (SHOW_LOGS) Log.v(TAG, "onAnimationEnd, remove child " + child);
+                        mOverlayViewGroup.remove(child);
+
+                    }
+                    ViewGroup parent = (ViewGroup) mOverlayViewGroup.getParent();
+                    parent.removeView(mOverlayViewGroup);
+
+                }
+            });
         }
     }
 
@@ -109,7 +135,7 @@ public final class ExitTransition extends BaseTransition {
             Log.v(TAG, "getBackgroundImageView, width " + previousActivityBackground.getWidth());
 
         ImageView previousActivityBackgroundImage = new ImageView(activity);
-        previousActivityBackgroundImage.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_red_dark, null));
+        previousActivityBackgroundImage.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_red_dark));
         previousActivityBackgroundImage.setImageBitmap(previousActivityBackground);
         return previousActivityBackgroundImage;
     }
@@ -117,7 +143,7 @@ public final class ExitTransition extends BaseTransition {
     private Bitmap getPreviousActivityBackground(View view) {
 
 //        sContentView.setDrawingCacheEnabled(true);
-        Bitmap drawingCache = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap drawingCache = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
         Canvas c = new Canvas(drawingCache);
         view.draw(c);
 
@@ -138,8 +164,18 @@ public final class ExitTransition extends BaseTransition {
         return this;
     }
 
-    public ExitTransition withExitAnimator(TransitionAnimator animator) {
+    public ExitTransition withExitAnimator(ViewTransitionAnimator animator) {
         mExitAnimator = animator;
         return this;
+    }
+
+
+    public void useSharedElementAnimator(SharedElementTransitionAnimator sharedElementTransitionAnimator) {
+        mSharedElementsTransitionAnimator = sharedElementTransitionAnimator;
+    }
+
+    // remove it from Enter and add to exit
+    public SharedElementTransitionAnimator getSharedElementsTransitionAnimator() {
+        return mSharedElementsTransitionAnimator;
     }
 }

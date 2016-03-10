@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class OverlayViewGroup extends ViewGroup {
@@ -84,7 +85,29 @@ public class OverlayViewGroup extends ViewGroup {
                 Log.v(TAG, "add, not added");
             }
             parent.removeView(child);
+
+            // fail-safe if view is still attached for any reason
+            if (child.getParent() != null) {
+
+                Field f = null;
+                try {
+                    f = child.getClass().getDeclaredField("mParent");
+                    f.setAccessible(true);
+                    System.out.println("f.get(child): " + f.get(child));
+                    f.set(child, null);
+
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+
+            } else {
+                Log.v(TAG, "add, parent null");
+
+            }
         }
+
         super.addView(child);
     }
 

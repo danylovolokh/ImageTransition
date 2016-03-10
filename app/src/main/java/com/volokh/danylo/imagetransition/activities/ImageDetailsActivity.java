@@ -3,13 +3,14 @@ package com.volokh.danylo.imagetransition.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.library.OverlayViewGroup;
 import com.volokh.danylo.imagetransition.R;
+import com.volokh.danylo.imagetransition.library.animators.FadeOutAnimator;
+import com.volokh.danylo.imagetransition.library.handler.TransitionHandler;
 
 import java.io.File;
 
@@ -42,9 +43,8 @@ public class ImageDetailsActivity extends Activity{
         setContentView(R.layout.user_accout_activity_layout);
         mImage = (ImageView) findViewById(R.id.enlarged_image);
         mImageDescription = (TextView) findViewById(R.id.image_description);
-        String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
 
-        ViewCompat.setTransitionName(mImage, imageTransitionName);
+        String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
 
         mImageDownloader = Picasso.with(this);
 
@@ -52,9 +52,14 @@ public class ImageDetailsActivity extends Activity{
 
         mImageDownloader.load(imageFile).into(mImage);
 
+        TransitionHandler.instance()
+                .enterTransition()
+                .toActivity(this)
+                .addSharedElement("TransitionName", mImage);
+
 //        TransitionData transitionData = new TransitionData();
 //        transitionData.setTransitionActivity(this);
-//        transitionData.addTransitionView("TransitionName", mImage);
+//        transitionData.addSharedElement("TransitionName", mImage);
 //
 //        TransitionHandler transitionHandler = TransitionHandler.instance();
 //        transitionHandler.setEnterTransitionData(transitionData);

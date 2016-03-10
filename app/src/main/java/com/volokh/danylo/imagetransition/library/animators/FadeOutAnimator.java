@@ -7,7 +7,7 @@ import android.view.View;
 /**
  * Created by danylo.volokh on 3/8/16.
  */
-public class FadeOutAnimator extends TransitionAnimator {
+public class FadeOutAnimator extends ViewTransitionAnimator {
 
     private ObjectAnimator mFadeAnimator;
 
@@ -16,11 +16,12 @@ public class FadeOutAnimator extends TransitionAnimator {
     }
 
     @Override
-    public void animate(View view) {
+    public void animate(View view, final TransitionAnimatorListener listener) {
         mFadeAnimator = ObjectAnimator.ofFloat(view, "alpha", 1.f, 0.f);
         mFadeAnimator.addListener(new SimpleAnimationListener(){
             @Override
             public void onAnimationEnd(Animator animation) {
+                listener.onAnimationEnd();
                 mFadeAnimator = null;
             }
         });

@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -20,7 +19,7 @@ import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.ImagesAdapter;
 import com.volokh.danylo.imagetransition.library.OverlayViewGroup;
 import com.volokh.danylo.imagetransition.R;
-import com.volokh.danylo.imagetransition.activities_v21.ImagesListActivity_v21;
+import com.volokh.danylo.imagetransition.library.animators.ImageTransitionAnimator;
 import com.volokh.danylo.imagetransition.models.Image;
 import com.volokh.danylo.imagetransition.library.handler.TransitionHandler;
 import com.volokh.danylo.imagetransition.library.animators.FadeOutAnimator;
@@ -102,14 +101,14 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 
                 View decorView = getWindow().getDecorView();
 
+                ImageView imageView = new ImageView(ImagesListActivity.this);
+                imageView.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
+                FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
 
-//                ImageView imageView = new ImageView(ImagesListActivity.this);
-//                imageView.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
-//                FrameLayout contentView = (FrameLayout) decorView.findViewById(android.R.id.content);
-//
-//                contentView.setDrawingCacheEnabled(true);
+                contentView.setDrawingCacheEnabled(true);
+                contentView.getDrawingCache();
 //                Bitmap bitmap = Bitmap.createBitmap(contentView.getDrawingCache());
-//                contentView.setDrawingCacheEnabled(false); // clear drawing cache
+                contentView.setDrawingCacheEnabled(false); // clear drawing cache
 //                Log.v(TAG, "onClick, bitmap " + bitmap);
 //
 //                Log.v(TAG, "onClick, contentView " + contentView);
@@ -118,10 +117,10 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
 //                Log.v(TAG, "onClick, imageView.getLayoutParams() " + imageView.getLayoutParams());
 
 
-                ImagesListActivity.this.finish();
-
-                Intent startActivity_v21_intent = new Intent(ImagesListActivity.this, ImagesListActivity_v21.class);
-                startActivity(startActivity_v21_intent);
+//                ImagesListActivity.this.finish();
+//
+//                Intent startActivity_v21_intent = new Intent(ImagesListActivity.this, ImagesListActivity_v21.class);
+//                startActivity(startActivity_v21_intent);
 
             }
         });
@@ -241,7 +240,8 @@ public class ImagesListActivity extends Activity implements LoaderManager.Loader
                 .fromActivity(this)
                 .toActivity(ImageDetailsActivity.class)
                 .withExitAnimator(new FadeOutAnimator(4000))
-                .addTransitionView("TransitionName", image);
+                .addSharedElement("TransitionName", image)
+                .useSharedElementAnimator(new ImageTransitionAnimator(4000));
 
         Intent startIntent = ImageDetailsActivity.getStartIntent(this, sharedImageTransitionName, imageFile);
         startActivity(startIntent);

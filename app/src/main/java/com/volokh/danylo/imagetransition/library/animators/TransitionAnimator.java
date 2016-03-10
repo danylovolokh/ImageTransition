@@ -1,27 +1,35 @@
 package com.volokh.danylo.imagetransition.library.animators;
 
 import android.view.View;
+import android.view.animation.Interpolator;
 
 /**
  * Created by danylo.volokh on 3/8/16.
  */
 public abstract class TransitionAnimator {
 
-    private long mDuration;
+    private final long mDuration;
+    private Interpolator mInterpolator;
+
+    public interface TransitionAnimatorListener{
+        void onAnimationEnd();
+    }
 
     public TransitionAnimator(long duration) {
         mDuration = duration;
     }
 
-    public abstract void animate(View contentRoot);
+    protected long getDuration() {
+        return mDuration;
+    }
 
-    public TransitionAnimator setDuration(int duration){
-        mDuration = duration;
+    protected TransitionAnimator setInterpolator(Interpolator interpolator){
+        mInterpolator = interpolator;
         return this;
     }
 
-    protected long getDuration() {
-        return mDuration;
+    public Interpolator getInterpolator() {
+        return mInterpolator;
     }
 
     abstract void cancelCurrentAnimation();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
     <fade
-        android:duration="10000"/>
+        android:duration="3000"/>
 
 </transitionSet>

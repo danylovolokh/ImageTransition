@@ -25,7 +25,7 @@ public abstract class BaseTransition {
         return mSharedElementsTransitionViews;
     }
 
-    protected abstract void handleActivityCreated(Activity activity, Bundle savedInstanceState);
+    protected abstract void handleActivityResumed(Activity activity);
 
     public BaseTransition addSharedElement(String transitionName, View view) {
         if(SHOW_LOGS) Log.v(TAG, "addSharedElement, transitionName[" + transitionName + "], view " + view);

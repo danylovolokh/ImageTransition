@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_container">
+
+    <TextView
+        android:text="Image Details Activity"
+        android:background="@color/white2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/enlarged_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/image_description"
+        android:gravity="top|left"
+        android:padding="20dp"
+        android:text="I see a beautiful city and a brilliant people rising from this abyss. I see the lives for which I lay down my life, peaceful, useful, prosperous and happy. I see that I hold a sanctuary in their hearts, and in the hearts of their descendants, generations hence. It is a far, far better thing that I do, than I have ever done; it is a far, far better rest that I go to than I have ever known."
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/orange"/>
+
+</LinearLayout>

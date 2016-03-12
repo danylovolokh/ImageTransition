@@ -3,7 +3,7 @@ package com.volokh.danylo.imagetransition.library.transitions;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.os.Bundle;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -39,57 +39,59 @@ public final class ExitTransition extends BaseTransition {
     private SharedElementTransitionAnimator mSharedElementsTransitionAnimator;
 
     @Override
-    protected void handleActivityCreated(final Activity activity, Bundle savedInstanceState) {
+    protected void handleActivityResumed(final Activity activity) {
 
         if (mToActivity == activity.getClass()) {
-            if (SHOW_LOGS)
-                Log.v(TAG, "handleActivityCreated, savedInstanceState " + savedInstanceState);
-            if (savedInstanceState == null) {
-                if (SHOW_LOGS)
-                    Log.v(TAG, "handleActivityCreated, savedInstanceState null, animate entering");
-                final View decorView = activity.getWindow().getDecorView();
+            if (SHOW_LOGS) Log.v(TAG, "handleActivityResumed, animate entering");
+            final View decorView = activity.getWindow().getDecorView();
 
-                decorView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            decorView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 
-                    public int mFramesCount;
+                public int mFramesCount;
 
-                    @Override
-                    public boolean onPreDraw() {
+                @Override
+                public boolean onPreDraw() {
 
-                        if (SHOW_LOGS)
-                            Log.v(TAG, "onPreDraw, handleActivityCreated, mFramesCount " + mFramesCount);
-                        FrameLayout contentRoot = (FrameLayout) decorView.findViewById(android.R.id.content);
+                    if (SHOW_LOGS) Log.v(TAG, "onPreDraw, handleActivityResumed, mFramesCount " + mFramesCount);
+                    final FrameLayout contentRoot = (FrameLayout) decorView.findViewById(android.R.id.content);
 
-                        if (mFramesCount++ == 1) {
-                            decorView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    if (mFramesCount++ == 1) {
+                        decorView.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                            // add shared elements to overlay view group
-                            // set background without shared elements
-                            mOverlayViewGroup = new OverlayViewGroup(activity, contentRoot);
+                        // add shared elements to overlay view group
+                        // set background without shared elements
+                        mOverlayViewGroup = new OverlayViewGroup(activity, contentRoot);
 //                                        overlayViewGroup.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));
 
-                            for (View view : getSharedElementsTransitionViews().values()) {
-                                mOverlayViewGroup.add(view);
-                            }
-
-                            contentRoot.addView(mOverlayViewGroup);
-
-                        } else {
-
-                            // set background with shared elements
-                            ImageView previousActivityBackgroundImage = getBackgroundImageView(activity);
-
-                            if (SHOW_LOGS)
-                                Log.v(TAG, "onPreDraw, handleActivityCreated, contentRoot " + contentRoot);
-                            contentRoot.addView(previousActivityBackgroundImage);
-
-                            animateExiting(previousActivityBackgroundImage);
+                        for (View view : getSharedElementsTransitionViews().values()) {
+                            mOverlayViewGroup.add(view);
                         }
 
-                        return true;
+//                        contentRoot.addView(mOverlayViewGroup);
+
+                        contentRoot.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+//                                contentRoot.removeView(mOverlayViewGroup);
+//                                mOverlayViewGroup.removeAllViews();
+                            }
+                        }, 1000);
+
+                    } else {
+
+//                        // set background with shared elements
+//                        ImageView previousActivityBackgroundImage = getBackgroundImageView(activity);
+//
+//                        if (SHOW_LOGS)
+//                            Log.v(TAG, "onPreDraw, handleActivityResumed, contentRoot " + contentRoot);
+//                        contentRoot.addView(previousActivityBackgroundImage);
+//
+//                        animateExiting(previousActivityBackgroundImage);
                     }
-                });
-            }
+
+                    return true;
+                }
+            });
 
         }
 
@@ -101,7 +103,7 @@ public final class ExitTransition extends BaseTransition {
         return this;
     }
 
-    void animateExiting(View view) {
+    void animateExiting(final ImageView view) {
         if (SHOW_LOGS) Log.v(TAG, "animateExiting, view " + view);
         if (SHOW_LOGS) Log.v(TAG, "animateExiting, exitAnimator " + mExitAnimator);
 
@@ -118,6 +120,11 @@ public final class ExitTransition extends BaseTransition {
                     }
                     ViewGroup parent = (ViewGroup) mOverlayViewGroup.getParent();
                     parent.removeView(mOverlayViewGroup);
+
+                    Bitmap bitmap = ((BitmapDrawable)view.getDrawable()).getBitmap();
+                    boolean isRecycled = bitmap.isRecycled();
+                    if (SHOW_LOGS) Log.v(TAG, "onAnimationEnd, isRecycled " + isRecycled);
+                    bitmap.recycle();
 
                 }
             });

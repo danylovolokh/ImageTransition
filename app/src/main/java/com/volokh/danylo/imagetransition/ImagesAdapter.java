@@ -73,7 +73,6 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Activity activity = (Activity) holder.image.getContext();
 
                 mImagesAdapterCallback.enterImageDetails(sharedImageTransitionName, image.imageFile, holder.image);
 

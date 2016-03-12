@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.volokh.danylo.imagetransition.library.Config;
-import com.volokh.danylo.imagetransition.library.transition_data.TransitionData;
 import com.volokh.danylo.imagetransition.library.transitions.EnterTransition;
 import com.volokh.danylo.imagetransition.library.transitions.ExitTransition;
 
@@ -23,32 +22,43 @@ public class TransitionHandler implements EnterTransition.EnterTransitionCallbac
 
     private static TransitionHandler mTransitionHandler;
 
-    private TransitionData mEnterTransitionData;
-
     private BaseTransition mExitTransition;
     private BaseTransition mEnterTransition;
 
     TransitionHandler(Application application){
 
         application.registerActivityLifecycleCallbacks(new SimpleActivityLifecycleCallbacks() {
+
+            private Bundle mRecentBundle;
+
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-                if (SHOW_LOGS) Log.v(TAG, "onActivityCreated, activity " + activity);
-
-                if (SHOW_LOGS)
-                    Log.v(TAG, "onActivityCreated, mExitTransitionData " + mExitTransition);
-                if (mExitTransition != null) {
-                    mExitTransition.handleActivityCreated(activity, savedInstanceState);
-                    mExitTransition = null;
-                }
-
-                if (mEnterTransition != null) {
-                    mEnterTransition.handleActivityCreated(activity, savedInstanceState);
-                    mEnterTransition = null;
-                }
+                if (SHOW_LOGS) Log.v(TAG, "onActivityCreated, activity " + activity + ", savedInstanceState " + savedInstanceState);
+                mRecentBundle = savedInstanceState;
             }
 
+            @Override
+            public void onActivityResumed(Activity activity) {
+                if (SHOW_LOGS) Log.v(TAG, "onActivityResumed, activity " + activity);
+
+                if (SHOW_LOGS) Log.v(TAG, "onActivityResumed, mExitTransition " + mExitTransition);
+                if (SHOW_LOGS) Log.v(TAG, "onActivityResumed, mRecentBundle " + mRecentBundle);
+
+                if(mRecentBundle == null){
+                    // only if activity is started for the first time we run the animation
+                    if (mExitTransition != null) {
+                        mExitTransition.handleActivityResumed(activity);
+                        mExitTransition = null;
+                    }
+
+                    if (mEnterTransition != null) {
+                        mEnterTransition.handleActivityResumed(activity);
+                        mEnterTransition = null;
+                    }
+                    
+                }
+
+            }
         });
     }
 
@@ -78,10 +88,6 @@ public class TransitionHandler implements EnterTransition.EnterTransitionCallbac
         ExitTransition exitTransition = new ExitTransition();
         mExitTransition = exitTransition;
         return exitTransition;
-    }
-
-    public void setEnterTransitionData(TransitionData transitionData) {
-        mEnterTransitionData = transitionData;
     }
 
     public EnterTransition enterTransition() {

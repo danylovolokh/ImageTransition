@@ -1,8 +1,6 @@
-<!-- res/transition/change_image_transform.xml -->
-<!-- (see also Shared Transitions below) -->
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:duration="10000">
+    android:duration="3000">
 
     <changeBounds/>
     <changeImageTransform/>

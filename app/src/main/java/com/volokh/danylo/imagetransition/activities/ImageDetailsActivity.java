@@ -7,10 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.volokh.danylo.imagetransition.library.OverlayViewGroup;
 import com.volokh.danylo.imagetransition.R;
-import com.volokh.danylo.imagetransition.library.animators.FadeOutAnimator;
-import com.volokh.danylo.imagetransition.library.handler.TransitionHandler;
 
 import java.io.File;
 
@@ -28,8 +25,6 @@ public class ImageDetailsActivity extends Activity{
 
     private Picasso mImageDownloader;
 
-    private OverlayViewGroup sOverlayViewGroup;
-
     private int mFramesDrawn;
 
 
@@ -39,8 +34,7 @@ public class ImageDetailsActivity extends Activity{
 
         overridePendingTransition(0, 0);
 
-
-        setContentView(R.layout.user_accout_activity_layout);
+        setContentView(R.layout.image_details_activity_layout);
         mImage = (ImageView) findViewById(R.id.enlarged_image);
         mImageDescription = (TextView) findViewById(R.id.image_description);
 
@@ -52,10 +46,10 @@ public class ImageDetailsActivity extends Activity{
 
         mImageDownloader.load(imageFile).into(mImage);
 
-        TransitionHandler.instance()
+        /**TransitionHandler.instance()
                 .enterTransition()
                 .toActivity(this)
-                .addSharedElement("TransitionName", mImage);
+                .addSharedElement("TransitionName", mImage);*/
 
 //        TransitionData transitionData = new TransitionData();
 //        transitionData.setTransitionActivity(this);

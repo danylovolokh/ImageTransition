@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.R;
@@ -20,7 +19,6 @@ public class ImageDetailsActivity_v21 extends Activity{
     public static final String SHARED_ELEMENT_IMAGE_KEY = "SHARED_ELEMENT_IMAGE_KEY";
     public static final String IMAGE_FILE_KEY = "IMAGE_FILE_KEY";
 
-    private TextView mImageDescription;
     private ImageView mImage;
 
     private Picasso mImageDownloader;
@@ -29,11 +27,10 @@ public class ImageDetailsActivity_v21 extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_accout_activity_layout);
+        setContentView(R.layout.image_details_activity_layout);
         mImage = (ImageView) findViewById(R.id.enlarged_image);
-        mImageDescription = (TextView) findViewById(R.id.image_description);
-        String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
 
+        String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
         ViewCompat.setTransitionName(mImage, imageTransitionName);
 
         mImageDownloader = Picasso.with(this);

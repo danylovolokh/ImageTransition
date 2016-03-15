@@ -117,37 +117,44 @@ public class ImageFilesCreateLoader implements LoaderManager.LoaderCallbacks<Lis
     private void fillImageList(List<File> data) {
         List<Image> imagesList = new ArrayList<>();
 
+        int imageId = 0;
         int times = 7;
-        while(times-- > 0){
-            for (int i = 0; i < data.size(); i++) {
+        while(--times > 0){
+            for (int i = 0; i < data.size(); i++, imageId++) {
                 File file = data.get(i);
 
+                Log.v(TAG, "fillImageList, i+1 " + (i+1));
+
+                Log.v(TAG, "fillImageList, times " + times);
+
+                Log.v(TAG, "fillImageList, imageId " + imageId);
+
                 if(i % 6 == 0) {
-                    imagesList.add(new Image(file, ImageView.ScaleType.CENTER));
+                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER));
                     continue;
                 }
 
                 if(i % 5 == 0) {
-                    imagesList.add(new Image(file, ImageView.ScaleType.CENTER_CROP));
+                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER_CROP));
                     continue;
                 }
 
                 if(i % 4 == 0) {
-                    imagesList.add(new Image(file, ImageView.ScaleType.CENTER_INSIDE));
+                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER_INSIDE));
                     continue;
                 }
 
                 if(i % 3 == 0) {
-                    imagesList.add(new Image(file, ImageView.ScaleType.FIT_CENTER));
+                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.FIT_CENTER));
                     continue;
                 }
 
                 if(i % 2 == 0) {
-                    imagesList.add(new Image(file, ImageView.ScaleType.FIT_XY));
+                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.FIT_XY));
                     continue;
                 }
 
-                imagesList.add(new Image(file, ImageView.ScaleType.MATRIX));
+                imagesList.add(new Image(imageId, file, ImageView.ScaleType.MATRIX));
             }
         }
         mLoadFinishedCallback.onLoadFinished(imagesList);

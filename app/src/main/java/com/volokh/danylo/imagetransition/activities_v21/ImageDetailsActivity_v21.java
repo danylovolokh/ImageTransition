@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -32,7 +33,8 @@ public class ImageDetailsActivity_v21 extends Activity{
 
         String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
         ViewCompat.setTransitionName(mImage, imageTransitionName);
-
+        View mainContainer = findViewById(R.id.main_container);
+        mainContainer.setAlpha(1.f);
         mImageDownloader = Picasso.with(this);
 
         File imageFile = (File) getIntent().getSerializableExtra(IMAGE_FILE_KEY);

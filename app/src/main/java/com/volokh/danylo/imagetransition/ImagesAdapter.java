@@ -32,7 +32,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
     private final int mSpanCount;
 
     public interface ImagesAdapterCallback{
-        void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image);
+        void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image, Image imageModel);
     }
 
     public ImagesAdapter(ImagesAdapterCallback imagesAdapterCallback, List<Image> imagesList, Picasso imageDownloader, int spanCount) {
@@ -52,7 +52,6 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
         View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_item, parent, false);
         RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) item.getLayoutParams();
         layoutParams.height = item.getResources().getDisplayMetrics().widthPixels / mSpanCount;
-        Log.v(TAG, "onCreateViewHolder viewType " + viewType);
         return new ImagesViewHolder(item);
     }
 
@@ -66,15 +65,16 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesViewHolder> {
 
         mImageDownloader.load(image.imageFile).into(holder.image);
 
-        if(image.scaleType == ImageView.ScaleType.CENTER_CROP){
-            Log.v(TAG, "onBindViewHolder setWillNotCacheDrawing " + position);
-        }
+        Log.v(TAG, "onBindViewHolder isVisible " + image.isVisible() );
+
+        /** in purpose of animation image might become invisible */
+        holder.image.setVisibility(image.isVisible() ? View.VISIBLE : View.INVISIBLE);
 
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                mImagesAdapterCallback.enterImageDetails(sharedImageTransitionName, image.imageFile, holder.image);
+                mImagesAdapterCallback.enterImageDetails(sharedImageTransitionName, image.imageFile, holder.image, image);
 
             }
         });

@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.ChangeImageTransform;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -83,9 +84,10 @@ public class ImagesListActivity_v21 extends Activity implements ImagesAdapter.Im
 
 
     @Override
-    public void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image) {
+    public void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image, Image imageModel) {
         ActivityOptions activityOptions =
                 ActivityOptions.makeSceneTransitionAnimation(this, image, sharedImageTransitionName);
+        getWindow().setSharedElementEnterTransition(new ChangeImageTransform(this, null));
 
         Intent startIntent = ImageDetailsActivity_v21.getStartIntent(this, sharedImageTransitionName, imageFile);
         startActivity(startIntent, activityOptions.toBundle());

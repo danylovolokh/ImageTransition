@@ -2,6 +2,7 @@
 
     android:duration="3000">
 
+    <changeClipBounds/>
     <changeBounds/>
     <changeImageTransform/>
 </transitionSet>

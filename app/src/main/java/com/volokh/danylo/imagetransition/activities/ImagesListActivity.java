@@ -42,6 +42,8 @@ public class ImagesListActivity extends Activity implements ImagesAdapter.Images
 
     private RecyclerView mRecyclerView;
 
+    private GridLayoutManager mLayoutManager;
+
     private ImagesAdapter mAdapter;
 
     private Image mImageDetailsImageModel;
@@ -127,8 +129,8 @@ public class ImagesListActivity extends Activity implements ImagesAdapter.Images
 
     private void initializeRecyclerView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.accounts_recycler_view);
-
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, SPAN_COUNT));
+        mLayoutManager = new GridLayoutManager(this, SPAN_COUNT);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
         // we don't need animation when items are hidden or shown
         mRecyclerView.setItemAnimator(null);
@@ -202,7 +204,8 @@ public class ImagesListActivity extends Activity implements ImagesAdapter.Images
          * That's why we have to do this invalidation
          */
         Rect dirty = new Rect();
-        mRecyclerView.getChildAt(index).getDrawingRect(dirty);
+        View viewAtPosition = mLayoutManager.findViewByPosition(index);
+        viewAtPosition.getDrawingRect(dirty);
         mRecyclerView.invalidate(dirty);
     }
 

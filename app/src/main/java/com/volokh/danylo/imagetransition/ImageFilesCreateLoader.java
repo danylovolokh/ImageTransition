@@ -7,9 +7,8 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.ImageView;
 
-import com.volokh.danylo.imagetransition.models.Image;
+import com.volokh.danylo.imagetransition.adapter.Image;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -123,38 +122,10 @@ public class ImageFilesCreateLoader implements LoaderManager.LoaderCallbacks<Lis
             for (int i = 0; i < data.size(); i++, imageId++) {
                 File file = data.get(i);
 
-                Log.v(TAG, "fillImageList, i+1 " + (i+1));
-
-                Log.v(TAG, "fillImageList, times " + times);
-
                 Log.v(TAG, "fillImageList, imageId " + imageId);
 
-                if(i % 6 == 0) {
-                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER));
-                    continue;
-                }
+                imagesList.add(new Image(imageId, file));
 
-                if(i % 5 == 0) {
-                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER_CROP));
-                    continue;
-                }
-
-                if(i % 4 == 0) {
-                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.CENTER_INSIDE));
-                    continue;
-                }
-
-                if(i % 3 == 0) {
-                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.FIT_CENTER));
-                    continue;
-                }
-
-                if(i % 2 == 0) {
-                    imagesList.add(new Image(imageId, file, ImageView.ScaleType.FIT_XY));
-                    continue;
-                }
-
-                imagesList.add(new Image(imageId, file, ImageView.ScaleType.MATRIX));
             }
         }
         mLoadFinishedCallback.onLoadFinished(imagesList);

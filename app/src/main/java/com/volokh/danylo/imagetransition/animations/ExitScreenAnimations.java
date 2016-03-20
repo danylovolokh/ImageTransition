@@ -13,19 +13,15 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
 import com.squareup.otto.Bus;
-import com.volokh.danylo.imagetransition.MatrixEvaluator;
-import com.volokh.danylo.imagetransition.MatrixUtils;
 import com.volokh.danylo.imagetransition.event_bus.ChangeImageThumbnailVisibility;
 import com.volokh.danylo.imagetransition.event_bus.EventBusCreator;
-import com.volokh.danylo.imagetransition.library.animators.SimpleAnimationListener;
 
 /**
  * Created by danylo.volokh on 3/16/16.
  */
-public class ExitScreenAnimations {
+public class ExitScreenAnimations extends ScreenAnimation{
 
     private static final String TAG = ExitScreenAnimations.class.getSimpleName();
-    private static final long IMAGE_TRANSLATION_DURATION = 3000;
 
     private final Bus mBus = EventBusCreator.defaultEventBus();
 
@@ -46,6 +42,7 @@ public class ExitScreenAnimations {
     private float[] mToThumbnailMatrixValues;
 
     public ExitScreenAnimations(ImageView animatedImage, ImageView imageTo, View mainContainer) {
+        super(animatedImage.getContext());
         mAnimatedImage = animatedImage;
         mImageTo = imageTo;
         mMainContainer = mainContainer;
@@ -79,10 +76,6 @@ public class ExitScreenAnimations {
         mExitingAnimation.setDuration(IMAGE_TRANSLATION_DURATION);
         mExitingAnimation.setInterpolator(new AccelerateInterpolator());
         mExitingAnimation.addListener(new SimpleAnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
 
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -132,6 +125,7 @@ public class ExitScreenAnimations {
     @NonNull
     private ObjectAnimator createExitingImagePositionAnimator() {
 
+        // get initial location on the screen and start animation from there
         int[] locationOnScreen = new int[2];
         mAnimatedImage.getLocationOnScreen(locationOnScreen);
 
@@ -177,15 +171,6 @@ public class ExitScreenAnimations {
 
         return ObjectAnimator.ofObject(mAnimatedImage, MatrixEvaluator.ANIMATED_TRANSFORM_PROPERTY,
                 new MatrixEvaluator(), initialMatrix, endMatrix);
-    }
-
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = mAnimatedImage.getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = mAnimatedImage.getContext().getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     private ObjectAnimator createExitingFadeAnimator() {

@@ -5,34 +5,21 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.graphics.Matrix;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-import com.squareup.otto.Bus;
-import com.volokh.danylo.imagetransition.MatrixEvaluator;
-import com.volokh.danylo.imagetransition.MatrixUtils;
-import com.volokh.danylo.imagetransition.event_bus.ChangeImageThumbnailVisibility;
-import com.volokh.danylo.imagetransition.event_bus.EventBusCreator;
-import com.volokh.danylo.imagetransition.library.animators.SimpleAnimationListener;
 
 import java.util.Arrays;
 
 /**
  * Created by danylo.volokh on 3/16/16.
  */
-public class EnterScreenAnimations {
+public class EnterScreenAnimations extends ScreenAnimation{
 
     private static final String TAG = EnterScreenAnimations.class.getSimpleName();
-
-    private static final long IMAGE_TRANSLATION_DURATION = 3000;
-
-    private final Bus mBus = EventBusCreator.defaultEventBus();
 
     /**
      * Image with is initially situated on the place from where transition starts
@@ -63,6 +50,7 @@ public class EnterScreenAnimations {
     private int mToHeight;
 
     public EnterScreenAnimations(ImageView animatedImage, ImageView imageTo, View mainContainer) {
+        super(animatedImage.getContext());
         mAnimatedImage = animatedImage;
         mImageTo = imageTo;
         mMainContainer = mainContainer;
@@ -72,26 +60,17 @@ public class EnterScreenAnimations {
      * This method runs entering animation if bundle is null -
      * it means that we entered the activity for the first time and not returning to it from recent apps or so.
      */
-    public void runEnterAnimationIfNeeded(Bundle savedInstanceState, int left, int top, int width, int height, View mainContainer) {
+    public void runEnterAnimationIfNeeded(int left, int top, int width, int height) {
+        Log.v(TAG, "runEnterAnimationIfNeeded");
+
         mToLeft = left;
         mToTop = top;
         mToWidth = width;
         mToHeight =  height;
-        Log.v(TAG, "runEnterAnimationIfNeeded, savedInstanceState " + savedInstanceState);
 
-        if (savedInstanceState == null) {
-            // if savedInstanceState is null activity is started for the first time.
-            // run the animation
+        playEnteringAnimation();
 
-            // start animation only when layout is measured and laid out.
-            playEnteringAnimation();
-
-        } else {
-            // Activity is retrieved. Main container is invisible. Make it visible
-            mainContainer.setAlpha(1.0f);
-        }
     }
-
 
     /**
      * This method combines several animations when screen is opened.
@@ -100,8 +79,7 @@ public class EnterScreenAnimations {
      */
 
     private void playEnteringAnimation() {
-
-        mAnimatedImage.setVisibility(View.VISIBLE);
+        Log.v(TAG, ">> playEnteringAnimation");
 
         AnimatorSet imageAnimatorSet = createEnteringImageAnimation();
 
@@ -110,13 +88,7 @@ public class EnterScreenAnimations {
         mEnteringAnimation = new AnimatorSet();
         mEnteringAnimation.setDuration(IMAGE_TRANSLATION_DURATION);
         mEnteringAnimation.setInterpolator(new AccelerateInterpolator());
-        mEnteringAnimation.addListener(new SimpleAnimationListener(){
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                Log.v(TAG, "onAnimationStart");
-                mBus.post(new ChangeImageThumbnailVisibility(false));
-            }
+        mEnteringAnimation.addListener(new SimpleAnimationListener() {
 
             @Override
             public void onAnimationCancel(Animator animation) {
@@ -128,7 +100,7 @@ public class EnterScreenAnimations {
             public void onAnimationEnd(Animator animation) {
 
                 Log.v(TAG, "onAnimationEnd, mEnteringAnimation " + mEnteringAnimation);
-                if(mEnteringAnimation != null){
+                if (mEnteringAnimation != null) {
                     mEnteringAnimation = null;
 
                     mImageTo.setVisibility(View.VISIBLE);
@@ -146,6 +118,7 @@ public class EnterScreenAnimations {
         );
 
         mEnteringAnimation.start();
+        Log.v(TAG, "<< playEnteringAnimation");
     }
 
     /**
@@ -187,8 +160,8 @@ public class EnterScreenAnimations {
         PropertyValuesHolder propertyTop = PropertyValuesHolder.ofInt("top", mAnimatedImage.getTop(),
                 mToTop - getStatusBarHeight());
 
-        PropertyValuesHolder propertyRight = PropertyValuesHolder.ofInt("right", mAnimatedImage.getRight(), mToLeft + mImageTo.getWidth());
-        PropertyValuesHolder propertyBottom = PropertyValuesHolder.ofInt("bottom", mAnimatedImage.getBottom(), mToTop + mImageTo.getHeight() - getStatusBarHeight());
+        PropertyValuesHolder propertyRight = PropertyValuesHolder.ofInt("right", mAnimatedImage.getRight(), mToLeft + mToWidth);
+        PropertyValuesHolder propertyBottom = PropertyValuesHolder.ofInt("bottom", mAnimatedImage.getBottom(), mToTop + mToHeight - getStatusBarHeight());
 
         ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(mAnimatedImage, propertyLeft, propertyTop, propertyRight, propertyBottom);
         animator.addListener(new SimpleAnimationListener() {
@@ -228,15 +201,6 @@ public class EnterScreenAnimations {
 
         return ObjectAnimator.ofObject(mAnimatedImage, MatrixEvaluator.ANIMATED_TRANSFORM_PROPERTY,
                 new MatrixEvaluator(), initMatrix, endMatrix);
-    }
-
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = mAnimatedImage.getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = mAnimatedImage.getContext().getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     public float[] getInitialThumbnailMatrixValues() {

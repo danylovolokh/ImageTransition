@@ -1,4 +1,4 @@
-package com.volokh.danylo.imagetransition.library.animators;
+package com.volokh.danylo.imagetransition.animations;
 
 import android.animation.Animator;
 

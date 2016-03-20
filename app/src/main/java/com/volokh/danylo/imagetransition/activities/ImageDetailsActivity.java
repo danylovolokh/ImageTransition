@@ -1,18 +1,12 @@
 package com.volokh.danylo.imagetransition.activities;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Matrix;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -23,10 +17,7 @@ import com.volokh.danylo.imagetransition.animations.EnterScreenAnimations;
 import com.volokh.danylo.imagetransition.animations.ExitScreenAnimations;
 import com.volokh.danylo.imagetransition.event_bus.ChangeImageThumbnailVisibility;
 import com.volokh.danylo.imagetransition.event_bus.EventBusCreator;
-import com.volokh.danylo.imagetransition.MatrixEvaluator;
-import com.volokh.danylo.imagetransition.MatrixUtils;
 import com.volokh.danylo.imagetransition.R;
-import com.volokh.danylo.imagetransition.library.animators.SimpleAnimationListener;
 
 import java.io.File;
 
@@ -70,51 +61,132 @@ public class ImageDetailsActivity extends Activity {
 
         File imageFile = (File) getIntent().getSerializableExtra(IMAGE_FILE_KEY);
 
-        View mainContainer = findViewById(R.id.main_container);
+        final View mainContainer = findViewById(R.id.main_container);
 
-        initializeTransitionView();
+        if(savedInstanceState == null){
+            // We entered activity for the first time.
+            // Initialize Image view that will be transitioned
+            initializeTransitionView();
+        } else {
+            // Activity is retrieved. Main container is invisible. Make it visible
+            mainContainer.setAlpha(1.0f);
+        }
 
         mEnterScreenAnimations = new EnterScreenAnimations(mTransitionImage, mEnlargedImage, mainContainer);
         mExitScreenAnimations = new ExitScreenAnimations(mTransitionImage, mEnlargedImage, mainContainer);
 
+        initializeEnlargedImageAndRunAnimation(savedInstanceState, imageFile);
+    }
+
+    /**
+     * This method waits for the main "big" image is loaded.
+     * And then if activity is started for the first time - it runs "entering animation"
+     *
+     * Activity is entered fro the first time if saveInstanceState is null
+     *
+     */
+
+    private void initializeEnlargedImageAndRunAnimation(final Bundle savedInstanceState, File imageFile) {
+        Log.v(TAG, "initializeEnlargedImageAndRunAnimation");
+
         mImageDownloader.load(imageFile).into(mEnlargedImage, new Callback() {
+
+            /**
+             * Image is loaded when this method is called
+             */
             @Override
             public void onSuccess() {
-                Log.v(TAG, "onSuccess");
+                Log.v(TAG, "onSuccess, mEnlargedImage");
 
                 // In this callback we already have image set into ImageView and we can use it's Matrix for animation
                 // But we have to wait for final measurements. We use OnPreDrawListener to be sure everything is measured
 
-                mEnlargedImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-
-                    @Override
-                    public boolean onPreDraw() {
-                        // When this method is called we already have everything laid out and measured so we can start our animation
-                        Log.v(TAG, "onPreDraw");
-                        mEnlargedImage.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                        final int[] finalLocationOnTheScreen = new int[2];
-                        mEnlargedImage.getLocationOnScreen(finalLocationOnTheScreen);
-
-                        mEnterScreenAnimations.runEnterAnimationIfNeeded(
-                                savedInstanceState,
-                                finalLocationOnTheScreen[0], // left
-                                finalLocationOnTheScreen[1], // top
-                                mEnlargedImage.getWidth(),
-                                mEnlargedImage.getHeight(),
-                                findViewById(R.id.main_container));
-
-                        return true;
-                    }
-                });
+                if (savedInstanceState == null) {
+                    // if savedInstanceState is null activity is started for the first time.
+                    // run the animation
+                    runEnteringAnimation();
+                } else {
+                    // activity was retrieved from recent apps. No animation needed, just load the image
+                }
             }
 
             @Override
             public void onError() {
+                // CAUTION: on error is not handled. If OutOfMemory emerged during image loading we have to handle it here
                 Log.v(TAG, "onError, mEnlargedImage");
             }
         });
     }
+
+    /**
+     * This method does very tricky part:
+     *
+     * It sets up {@link android.view.ViewTreeObserver.OnPreDrawListener}
+     * When onPreDraw() method is called the layout is already measured.
+     * It means that we can use locations of images on the screen at tis point.
+     *
+     * 1. When first frame is rendered we start animation.
+     * 2. We just let second frame to render
+     * 3. Make a view on the previous screen invisible and remove onPreDrawListener
+     *
+     * Why do we do that:
+     * The Android rendering system is double-buffered.
+     * Similar technique is used in the SDK. See here : {@link android.app.EnterTransitionCoordinator#startSharedElementTransition}
+     *
+     * You can read more about it here : https://source.android.com/devices/graphics/architecture.html
+     *
+     */
+    private void runEnteringAnimation() {
+        Log.v(TAG, "runEnteringAnimation, addOnPreDrawListener");
+
+        mEnlargedImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+
+            int mFrames = 0;
+
+            @Override
+            public boolean onPreDraw() {
+                // When this method is called we already have everything laid out and measured so we can start our animation
+                Log.v(TAG, "onPreDraw, mFrames " + mFrames);
+
+                switch (mFrames++) {
+                    case 0:
+                        /**
+                         * 1. start animation on first frame
+                         */
+                        final int[] finalLocationOnTheScreen = new int[2];
+                        mEnlargedImage.getLocationOnScreen(finalLocationOnTheScreen);
+
+                        mEnterScreenAnimations.runEnterAnimationIfNeeded(
+                                finalLocationOnTheScreen[0], // left
+                                finalLocationOnTheScreen[1], // top
+                                mEnlargedImage.getWidth(),
+                                mEnlargedImage.getHeight());
+
+                        return true;
+                    case 1:
+                        /**
+                         * 2. Do nothing. We just draw this frame
+                         */
+
+                        return true;
+                }
+                /**
+                 * 3.
+                 * Make view on previous screen invisible on after this drawing frame
+                 * Here we ensure that animated view will be visible when we make the viw behind invisible
+                 */
+                Log.v(TAG, "run, onAnimationStart");
+                mBus.post(new ChangeImageThumbnailVisibility(false));
+
+                mEnlargedImage.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                Log.v(TAG, "onPreDraw, << mFrames " + mFrames);
+
+                return true;
+            }
+        });
+    }
+
 
     private void initializeTransitionView() {
         Log.v(TAG, "initializeTransitionView");
@@ -150,7 +222,6 @@ public class ImageDetailsActivity extends Activity {
         mTransitionImage.setScaleType(scaleType);
 
         mImageDownloader.load(imageFile).noFade().into(mTransitionImage);
-        mTransitionImage.setVisibility(View.INVISIBLE);
     }
 
     private int getStatusBarHeight() {

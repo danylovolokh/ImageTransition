@@ -15,10 +15,10 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.volokh.danylo.imagetransition.ImageFilesCreateLoader;
-import com.volokh.danylo.imagetransition.ImagesAdapter;
+import com.volokh.danylo.imagetransition.adapter.ImagesAdapter;
 import com.volokh.danylo.imagetransition.R;
 import com.volokh.danylo.imagetransition.activities.ImagesListActivity;
-import com.volokh.danylo.imagetransition.models.Image;
+import com.volokh.danylo.imagetransition.adapter.Image;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class ImagesListActivity_v21 extends Activity implements ImagesAdapter.Im
 
     private final List<Image> mImagesList = new ArrayList<>();
 
-    private static final int SPAN_COUNT = 4;
+    private static final int SPAN_COUNT = 2;
 
     private Picasso mImageDownloader;
     private RecyclerView mRecyclerView;
@@ -87,6 +87,7 @@ public class ImagesListActivity_v21 extends Activity implements ImagesAdapter.Im
     public void enterImageDetails(String sharedImageTransitionName, File imageFile, ImageView image, Image imageModel) {
         ActivityOptions activityOptions =
                 ActivityOptions.makeSceneTransitionAnimation(this, image, sharedImageTransitionName);
+
         getWindow().setSharedElementEnterTransition(new ChangeImageTransform(this, null));
 
         Intent startIntent = ImageDetailsActivity_v21.getStartIntent(this, sharedImageTransitionName, imageFile);

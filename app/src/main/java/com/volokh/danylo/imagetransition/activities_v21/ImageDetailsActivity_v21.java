@@ -29,10 +29,13 @@ public class ImageDetailsActivity_v21 extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_details_activity_layout);
+
         mImage = (ImageView) findViewById(R.id.enlarged_image);
+        mImage.setVisibility(View.VISIBLE);
 
         String imageTransitionName = getIntent().getStringExtra(SHARED_ELEMENT_IMAGE_KEY);
         ViewCompat.setTransitionName(mImage, imageTransitionName);
+
         View mainContainer = findViewById(R.id.main_container);
         mainContainer.setAlpha(1.f);
         mImageDownloader = Picasso.with(this);

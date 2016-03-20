@@ -1,6 +1,6 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:duration="3000">
+    android:duration="1000">
 
     <changeClipBounds/>
     <changeBounds/>

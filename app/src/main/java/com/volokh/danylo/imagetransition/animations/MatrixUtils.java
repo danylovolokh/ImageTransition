@@ -1,4 +1,4 @@
-package com.volokh.danylo.imagetransition;
+package com.volokh.danylo.imagetransition.animations;
 
 import android.graphics.Matrix;
 import android.graphics.Rect;

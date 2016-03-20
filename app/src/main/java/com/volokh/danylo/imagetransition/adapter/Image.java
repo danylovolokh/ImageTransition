@@ -1,8 +1,7 @@
-package com.volokh.danylo.imagetransition.models;
+package com.volokh.danylo.imagetransition.adapter;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.ImageView;
 
 import java.io.File;
 
@@ -18,23 +17,21 @@ public class Image implements Parcelable{
 
     public final int imageId;
     public final File imageFile;
-    public final ImageView.ScaleType scaleType;
 
     /**
      * By default the image is visible but for the purpose of the animation it will be changed to invisible at some time.
      */
     private boolean mImageIsVisible = true;
 
-    public Image(int imageId, File imageFile, ImageView.ScaleType imageScaleType) {
+    public Image(int imageId, File imageFile) {
         this.imageId = imageId;
         this.imageFile = imageFile;
-        this.scaleType = imageScaleType;
     }
 
     protected Image(Parcel in) {
         imageId = in.readInt();
         imageFile = (File) in.readSerializable();
-        scaleType = (ImageView.ScaleType) in.readSerializable();
+        mImageIsVisible = in.readByte() != 0;
     }
 
     @Override
@@ -60,7 +57,6 @@ public class Image implements Parcelable{
         return "Image{" +
                 "imageId=" + imageId +
                 ", imageFile=" + imageFile +
-                ", scaleType=" + scaleType +
                 ", mImageIsVisible=" + mImageIsVisible +
                 '}';
     }
@@ -86,7 +82,7 @@ public class Image implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(imageId);
         dest.writeSerializable(imageFile);
-        dest.writeSerializable(scaleType);
+        dest.writeByte((byte) (mImageIsVisible ? 1 : 0));
     }
 
     public boolean isVisible() {

@@ -1,13 +1,10 @@
-package com.volokh.danylo.imagetransition;
+package com.volokh.danylo.imagetransition.animations;
 
 import android.animation.TypeEvaluator;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.util.Property;
 import android.widget.ImageView;
-
-import java.util.Arrays;
 
 /**
  * This class is passed to ObjectAnimator in order to animate changes in ImageView image matrix

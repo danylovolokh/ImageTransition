@@ -57,29 +57,17 @@ public class EnterScreenAnimations extends ScreenAnimation{
     }
 
     /**
-     * This method runs entering animation if bundle is null -
-     * it means that we entered the activity for the first time and not returning to it from recent apps or so.
+     * This method combines several animations when screen is opened.
+     * 1. Animation of ImageView position and image matrix.
+     * 2. Animation of main container elements - they are fading in after image is animated to position
      */
-    public void runEnterAnimationIfNeeded(int left, int top, int width, int height) {
-        Log.v(TAG, "runEnterAnimationIfNeeded");
+    public void playEnteringAnimation(int left, int top, int width, int height) {
+        Log.v(TAG, ">> playEnteringAnimation");
 
         mToLeft = left;
         mToTop = top;
         mToWidth = width;
         mToHeight =  height;
-
-        playEnteringAnimation();
-
-    }
-
-    /**
-     * This method combines several animations when screen is opened.
-     * 1. Animation of ImageView position and image matrix.
-     * 2. Animation of main container elements - they are fading in after image is animated to position
-     */
-
-    private void playEnteringAnimation() {
-        Log.v(TAG, ">> playEnteringAnimation");
 
         AnimatorSet imageAnimatorSet = createEnteringImageAnimation();
 

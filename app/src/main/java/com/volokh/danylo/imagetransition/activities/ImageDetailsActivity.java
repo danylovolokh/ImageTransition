@@ -156,7 +156,7 @@ public class ImageDetailsActivity extends Activity {
                         final int[] finalLocationOnTheScreen = new int[2];
                         mEnlargedImage.getLocationOnScreen(finalLocationOnTheScreen);
 
-                        mEnterScreenAnimations.runEnterAnimationIfNeeded(
+                        mEnterScreenAnimations.playEnteringAnimation(
                                 finalLocationOnTheScreen[0], // left
                                 finalLocationOnTheScreen[1], // top
                                 mEnlargedImage.getWidth(),

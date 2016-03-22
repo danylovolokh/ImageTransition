@@ -13,7 +13,9 @@ Animation and canceling animation in the middle of it.
 
 # Details of implementation
 
-TODO
+[![Medium](https://img.shields.io/badge/Meduim-Implementing%20ImageView%20transition%20between%20activities%20for%20pre--Lollipop%20devices.-blue.svg)](https://medium.com/@v.danylo/implementing-imageview-transition-between-activities-for-pre-lollipop-devices-8b24bc387a2a)
+
+
 
 # License
 
